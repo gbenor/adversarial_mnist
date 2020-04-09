@@ -31,7 +31,7 @@ class AbcModel(ABC):
     def model_exists(self):
         return (self._fname_json.exists() and self._fname_weights.exists())
 
-    def model(self):
+    def get_model(self):
         return self._model
 
     def temp(self):
@@ -90,11 +90,11 @@ class AbcModel(ABC):
         return self._model.predict(x, batch_size, verbose, steps, callbacks, max_queue_size,
                                    workers, use_multiprocessing)
 
-    def predict(self, x, batch_size=None, verbose=0, steps=None, callbacks=None, max_queue_size=10,
-                workers=1, use_multiprocessing=False):
-        logit = self.get_logit(x, batch_size, verbose, steps, callbacks, max_queue_size,
-                                   workers, use_multiprocessing)
-        return tf.nn.softmax(logit)
+    # def predict(self, x, batch_size=None, verbose=0, steps=None, callbacks=None, max_queue_size=10,
+    #             workers=1, use_multiprocessing=False):
+    #     logit = self.get_logit(x, batch_size, verbose, steps, callbacks, max_queue_size,
+    #                                workers, use_multiprocessing)
+    #     return tf.nn.softmax(logit)
 
 
 

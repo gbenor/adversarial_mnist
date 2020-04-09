@@ -36,7 +36,7 @@ class Distillation (AbcModel):
                                            validation_freq, max_queue_size,
                                            workers, use_multiprocessing)
 
-        self._model = student.model()
+        self._model = student.get_model()
 
     def build(self):
         pass

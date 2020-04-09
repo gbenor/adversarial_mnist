@@ -1,4 +1,4 @@
-CONV_MINST_FNAME = "conv_minst"
+RESULTS_DF_CSV_NAME = "results.csv"
 LOG_FILE = "ex1.log"
 num_classes = 10
 

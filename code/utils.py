@@ -50,24 +50,34 @@ def load_data():
     test_labels = keras.utils.to_categorical(test_labels, num_classes)
     return train_images, train_labels, test_images, test_labels
 
+def get_target_label(test_labels, num_classes):
+    target = (np.argmax(test_labels, axis=1) + np.random.randint(1, num_classes,
+                                                                 size=(test_labels.shape[0]))) % num_classes
+    target = keras.utils.to_categorical(target, num_classes)
+    return target
+
 
 ''' A simple utility funcion for evaluating the success of an attack
 '''
 def TestAttack(model, adv_images, orig_images, true_labels,
                target=None, target_labels=None, targeted=False, prefix=None):
-    def attack_info(s):
-        logger.info(f"{prefix}: {s}")
+    result = {}
+    def attack_info(k, v):
+        logger.info(f"{prefix}: {k}: {v:.2f}")
+        result[k] = v
+
+
     score = model.evaluate(adv_images, true_labels, verbose=0)
-    attack_info('Test loss: {:.2f}'.format(score[0]))
-    attack_info('Successfully moved out of source class: {:.2f}'.format(1 - score[1]))
+    attack_info('Test loss', score[0])
+    attack_info('Successfully moved out of source class', (1 - score[1]))
 
     if targeted:
         score = model.evaluate(adv_images, target, verbose=0)
-        attack_info('Test loss: {:.2f}'.format(score[0]))
-        attack_info('Successfully perturbed to target class: {:.2f}'.format(score[1]))
+        attack_info('Test loss', score[0])
+        attack_info('Successfully perturbed to target class', score[1])
 
     dist = np.mean(np.sqrt(np.mean(np.square(adv_images - orig_images), axis=(1, 2, 3))))
-    attack_info('Mean perturbation distance: {:.2f}'.format(dist))
+    attack_info('Mean perturbation distance', dist)
 
     fig = plt.figure(figsize=(16, 10))
     for row, sample_id in enumerate(range(10,13)):
@@ -78,13 +88,13 @@ def TestAttack(model, adv_images, orig_images, true_labels,
         perturbation_norm = LA.norm(figs["perturbation"], ord="fro")
 
         for col, (title, img) in enumerate(figs.items()):
-            print(title)
             if title=="perturbation":
                 title = f"perturbation={perturbation_norm:.3f}"
             ax = fig.add_subplot(3, 3, row*3 + col + 1, title=title)
             plt.imshow(img, cmap='gray')
 
     plt.savefig(f"{prefix}.pdf", format="pdf", bbox_inches='tight')
+    return result
 
 
 
